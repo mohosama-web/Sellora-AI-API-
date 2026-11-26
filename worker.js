@@ -69,7 +69,6 @@ const INSTRUCTION_GOOGLE_GEMMA = `
 function b64Encode(str){ const bytes = new TextEncoder().encode(str); let bin=''; bytes.forEach(b=>bin+=String.fromCharCode(b)); return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
 function b64Decode(str){ str=str.replace(/-/g,'+').replace(/_/g,'/'); while(str.length%4) str+='='; const bin=atob(str); const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0)); return new TextDecoder().decode(bytes); }
 
-// === التعديل 2: توقيع حقيقي للتوكن بـ JWT_SECRET ===
 async function hmacSign(secret, data){
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(data));
@@ -188,7 +187,6 @@ export default {
     if(url.pathname === '/api/auth/google' && request.method === 'POST'){
       try{
         const { credential } = await request.json();
-        // === التعديل 3: التحقق من credential عند جوجل فعلاً، مش قراءة ساي ===
         const v = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
         if(!v.ok) return json({ error: 'فشل التحقق من Google' }, 401);
         const payload = await v.json();
@@ -211,7 +209,8 @@ export default {
     if(url.pathname === '/api/generate' && request.method === 'POST'){
       const user = await verifyToken(request, env); if(!user) return json({ error: 'يرجى تسجيل الدخول أولاً للمتابعة.' }, 401);
       const today = new Date().toISOString().slice(0,10); const key = `count:${user.email}:${today}`; let count = parseInt(await env.TAJER_KV.get(key) || '0'); if(count >= 10) return json({ error: 'لقد استهلكت حصتك اليومية. يمكنك المحاولة غداً.' }, 429);
-      const body = await request.json(); const err = validateRequiredServer(body);```js
+      const body = await request.json(); const err = validateRequiredServer(body);
+      if(err) return json({ error: err }, 400);
       try{
         const out = await generate(env, body);
         await env.TAJER_KV.put(key, String(count + 1), { expirationTtl: 86400 });
