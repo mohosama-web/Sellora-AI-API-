@@ -16,6 +16,6 @@ GROQ_MODEL = "qwen/qwen3.8-27b"
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 GOOGLE_STUDIO_MODEL = "gemma-4-31b-it"
 GOOGLE_STUDIO_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
-GOOGLE_CLIENT_ID = "943446170068-r931vbq02vma0ev99173mu13jka15lsm.apps.googleusercontent.com"
+GOOGLE_CLIENT_ID = "731024229345-kc094g2t321840mcbvadki8hodr09ttj.apps.googleusercontent.com"
 # Secrets لازم تعملها في لوحة Worker - ما تكتبها هنا:
 # JWT_SECRET, GROQ_KEY1..8, GOOGLE_STUDIO_KEY1..4
